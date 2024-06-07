@@ -16,6 +16,8 @@ import loadingImg from "./assets/loader.gif";
 import "./style.css";
 import Fiction from "./components/Fiction/Fiction";
 import Biography from "./components/Bio/Biography";
+import Register from "../src/components/Register/Register"
+import SignIn from "../src/components/SignIn/SignIn"
 
 const App = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -30,36 +32,36 @@ const App = () => {
 
   const fetchProducts = async () => {
     const response = await fetch('http://localhost:5129/api/books/GetAllBooks');
-      
-      const data = await response.json();
+
+    const data = await response.json();
 
     setProducts(data.data);
   };
 
   const fetchMangaProducts = async () => {
     const response = await fetch('http://localhost:5129/api/books/GetAllBooks');
-      
-      const data = await response.json();
-      const filteredData = data.data.filter((item) => item.category.categoryName === "manga");
+
+    const data = await response.json();
+    const filteredData = data.data.filter((item) => item.category.categoryName === "manga");
 
     setMangaProducts(filteredData);
   };
 
   const fetchFeatureProducts = async () => {
     const response = await fetch('http://localhost:5129/api/books/GetAllBooks');
-      
-      const data = await response.json();
-      const filteredData = data.data.filter((item) => item.category.categoryName === "featured");
+
+    const data = await response.json();
+    const filteredData = data.data.filter((item) => item.category.categoryName === "featured");
 
     setFeatureProducts(filteredData);
   };
 
   const fetchFictionProducts = async () => {
-      const response = await fetch('http://localhost:5129/api/books/GetAllBooks');
-      
-      const data = await response.json();
-      const filteredData = data.data.filter((item) => item.category.categoryName === "Sci-Fi");
-      console.log(filteredData);
+    const response = await fetch('http://localhost:5129/api/books/GetAllBooks');
+
+    const data = await response.json();
+    const filteredData = data.data.filter((item) => item.category.categoryName === "Mystery");
+    console.log(filteredData);
 
     setFictionProducts(filteredData);
     // const { data } = await commerce.products.list({
@@ -79,18 +81,89 @@ const App = () => {
 
   const fetchCart = async () => {
     const response = await fetch('http://localhost:5129/api/Cart/GetAllCarts');
-      
-      const data = await response.json();
-      const filteredData = data.data.filter((item) => item.userId === 2);
-      console.log("cart data",data.data);
-      
-    setCart(filteredData);
+
+    const data = await response.json();
+
+    if (data.data != undefined) {
+      const filteredData = data.data.filter((item) => item.userId === 1);
+      console.log("cart data", data.data);
+
+      setCart(filteredData);
+    }
+    else {
+      setCart([]);
+    }
+
   };
 
   const handleAddToCart = async (productId, quantity) => {
-    const item = await commerce.cart.add(productId, quantity);
+    const userId = 1;
+    const response = await fetch(`http://localhost:5129/api/Cart/GetCartById/${userId}`);
+    const data = await response.json();
+    console.log("handle add to cart ", data.data);
+    if (data.success) {
+      //already thee=re is a cart foir the suser add the book in that
+      const response = await fetch(`http://localhost:5129/api/Books/GetBookById/${productId}`);
+    const bookdata = await response.json();
 
-    setCart(item.cart);
+      const cartId = data.data.cartID;
+      console.log("book data",bookdata.data.bookPrice);
+      const userId = 1;
+      fetch(`http://localhost:5129/api/CartDetail/CreateCartDetail`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any additional headers if required
+          //add here the jwt authroization token
+        },
+        body: JSON.stringify({
+          // Add the request payload here
+          "cartID": cartId,
+          "bookId": productId,
+          "cartQuantity": 1,
+          "subTotalCart": 0
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Handle the response data here
+          console.log(data);
+
+        })
+        .catch(error => {
+          // Handle any errors that occur during the fetch call
+        });
+
+    }
+    //if this is false then create a new cart for the user and the add the boom in that cart
+    else {
+      const userId = 1;
+      fetch(`http://localhost:5129/api/Cart/CreateCart/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any additional headers if required
+          //add here the jwt authroization token
+        },
+        body: JSON.stringify({
+          // Add the request payload here
+          "userId": userId,
+          "cartTotal": 0
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Handle the response data here
+          console.log(data);
+
+        })
+        .catch(error => {
+          // Handle any errors that occur during the fetch call
+        });
+
+    }
+
+    fetchCart();
   };
 
   const handleUpdateCartQty = async (lineItemId, quantity) => {
@@ -100,19 +173,43 @@ const App = () => {
   };
 
   const handleRemoveFromCart = async (lineItemId) => {
-    const response = await fetch('http://localhost:5129/api/Cart/');
+    // const userId = localStorage.getItem("userId")
+    console.log("from the main method ",lineItemId);
+   
+    try {
+      const response = await fetch(`http://localhost:5129/api/CartDetail/DeleteCartDetail/${lineItemId}`, {
+        method: 'DELETE'
+      }).then(response => response.json()).then(data => {
+        // Handle the response data here
+        console.log(data);
+
+      })
+      .catch(error => {
+        // Handle any errors that occur during the fetch call
+        console.log(error);
+      });;
       
-      const data = await response.json();
-      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+    
 
-    setCart(response.cart);
+
+    // const data = await response.json();
+    //console.log(response);
+    // if (response === "true") {
+    //   console.log("came here ");
+    //   setCart([]);
+    // }
+    // else {
+    //   console.log(response);
+    // }
+
   };
 
-  const handleEmptyCart = async () => {
-    const response = await commerce.cart.empty();
-
-    setCart(response.cart);
-  };
+ const handleEmptyCart = async () =>{
+  console.log("empyty cart");
+ }
 
   const refreshCart = async () => {
     const newCart = await commerce.cart.refresh();
@@ -206,6 +303,15 @@ const App = () => {
                     handleUpdateCartQty
                   />
                 </Route>
+                <Route path="/register" exact>
+                 <Register/>
+                </Route>
+                
+                  <Route path="/login" exact>
+                  <SignIn/>
+                </Route>
+              
+                
               </Switch>
             </div>
           </Router>

@@ -15,15 +15,15 @@ const CartItem = ({ item, onUpdateCartQty, onRemoveFromCart }) => {
       <CardMedia image={item?.book?.bookImageLink} alt={item.book.bookTitle} className={classes.media} />
       <CardContent className={classes.cardContent}>
         <Typography variant="h6">{item.book.bookTitle}</Typography>
-        <Typography variant="h6" color='secondary' >{item.subTotalCart}</Typography>
+        <Typography variant="h6" color='secondary' >{item.book.bookPrice}</Typography>
       </CardContent>
       <CardActions className={classes.cardActions}>
         <div className={classes.buttons}>
-          <Button type="button" size="small" onClick={() => handleUpdateCartQty(item.bookId, item.cartQuantity - 1)}>-</Button>
+          <Button type="button" size="small" onClick={() => handleUpdateCartQty(item.cartDetailID, item.cartQuantity - 1)}>-</Button>
           <Typography>&nbsp;{item.cartQuantity}&nbsp;</Typography>
-          <Button type="button" size="small" onClick={() => handleUpdateCartQty(item.bookId, item.cartQuantity + 1)}>+</Button>
+          <Button type="button" size="small" onClick={() => handleUpdateCartQty(item.cartDetailID, item.cartQuantity + 1)}>+</Button>
         </div>
-        <Button className={classes.button} variant="contained" type="button" color='secondary' onClick={() => handleRemoveFromCart(item.bookId)}>Remove</Button>
+        <Button className={classes.button} variant="contained" type="button" color='secondary' onClick={() =>{console.log("remove from cart from there weare printing",item); handleRemoveFromCart(item.cartDetailID)}}>Remove</Button>
       </CardActions>
     </Card>
   );

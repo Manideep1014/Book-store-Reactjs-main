@@ -26,7 +26,7 @@ const Cart = ({ cart, onUpdateCartQty, onRemoveFromCart, onEmptyCart }) => {
     <>
       <Grid container spacing={4}>
         {cart[0].cartDetails.map((lineItem) => (
-          <Grid item xs={12} sm={4} key={lineItem.bookId}>
+          <Grid item xs={12} sm={4} key={lineItem.cartDetailID}>
             <CartItem item={lineItem} onUpdateCartQty={onUpdateCartQty} onRemoveFromCart={onRemoveFromCart} />
           </Grid>
         ))}
@@ -34,9 +34,9 @@ const Cart = ({ cart, onUpdateCartQty, onRemoveFromCart, onEmptyCart }) => {
       
       
       <div className={classes.cardDetails}>
-      <Typography variant="h5" >Subtotal: <b >{cart.cartTotal}</b></Typography>
+      {/* <Typography variant="h5" >Subtotal: <b >{cart.cartTotal}</b></Typography> */}
         <div>
-          <Button className={classes.emptyButton} size="large" type="button" variant="contained" color="secondary" onClick={handleEmptyCart}>Empty cart</Button>
+          {/* <Button className={classes.emptyButton} size="large" type="button" variant="contained" color="secondary" onClick={handleEmptyCart}>Empty cart</Button> */}
           <Button className={classes.checkoutButton} component={Link} to="/checkout" size="large" type="button" variant="contained" >Checkout</Button>
         </div>
       </div>
